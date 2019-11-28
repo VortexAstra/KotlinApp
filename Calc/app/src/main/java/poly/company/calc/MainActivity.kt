@@ -1,5 +1,6 @@
 package poly.company.calc
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -13,27 +14,96 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        if (getScreenOrientation()!!) {
+
+            initForPortrait()
+        } else {
+            initForLand()
+        }
+    }
+
+
+    private  fun initForPortrait() {
         //Numbers
-        tvOne.setOnClickListener { appendOnExpression("1", true) }
-        tvTwo.setOnClickListener { appendOnExpression("2", true) }
-        tvThree.setOnClickListener { appendOnExpression("3", true) }
-        tvFour.setOnClickListener { appendOnExpression("4", true) }
-        tvFive.setOnClickListener { appendOnExpression("5", true) }
-        tvSix.setOnClickListener { appendOnExpression("6", true) }
-        tvSeven.setOnClickListener { appendOnExpression("7", true) }
-        tvEight.setOnClickListener { appendOnExpression("8", true) }
-        tvNine.setOnClickListener { appendOnExpression("9", true) }
-        tvZero.setOnClickListener { appendOnExpression("0", true) }
-        tvDot.setOnClickListener { appendOnExpression(".", true) }
+        tvOne.setOnClickListener { true.appendOnExpression("1") }
+        tvTwo.setOnClickListener { true.appendOnExpression("2") }
+        tvThree.setOnClickListener { true.appendOnExpression("3") }
+        tvFour.setOnClickListener { true.appendOnExpression("4") }
+        tvFive.setOnClickListener { true.appendOnExpression("5") }
+        tvSix.setOnClickListener { true.appendOnExpression("6") }
+        tvSeven.setOnClickListener { true.appendOnExpression("7") }
+        tvEight.setOnClickListener { true.appendOnExpression("8") }
+        tvNine.setOnClickListener { true.appendOnExpression("9") }
+        tvZero.setOnClickListener { true.appendOnExpression("0") }
+        tvDot.setOnClickListener { true.appendOnExpression(".") }
 
         //Operators
-        tvPlus.setOnClickListener { appendOnExpression("+", true) }
-        tvMinus.setOnClickListener { appendOnExpression("-", true) }
-        tvMul.setOnClickListener { appendOnExpression("*", true) }
-        tvDivide.setOnClickListener { appendOnExpression("/", true) }
-        tvOpen.setOnClickListener { appendOnExpression("(", true) }
-        tvClose.setOnClickListener { appendOnExpression(")", true) }
+        tvPlus.setOnClickListener { true.appendOnExpression("+") }
+        tvMinus.setOnClickListener { true.appendOnExpression("-") }
+        tvMul.setOnClickListener { true.appendOnExpression("*") }
+        tvDivide.setOnClickListener { true.appendOnExpression("/") }
+        tvOpen.setOnClickListener { true.appendOnExpression("(") } //(
+        tvClose.setOnClickListener { true.appendOnExpression(")") } //)
 
+
+        tvClear.setOnClickListener {
+            tvExpressive.text = ""
+            tvResult.text = ""
+        }
+
+        tvBack.setOnClickListener {
+            val string = tvExpressive.text.toString()
+            if (string.isNotEmpty()) {
+                tvExpressive.text = string.substring(0, string.length - 1)
+            }
+            tvResult.text = ""
+        }
+
+
+        tvEquals.setOnClickListener {
+            try {
+                val expression = ExpressionBuilder(tvExpressive.text.toString()).build()
+                val result = expression.evaluate()
+                val longResult = result.toLong()
+
+                if (result == longResult.toDouble())
+                    tvResult.text = longResult.toString()
+                else
+                    tvResult.text = result.toString()
+
+            } catch (e: Exception) {
+                Log.d("Exception ", " message :" + e.message)
+            }
+        }
+    }
+
+
+    private  fun initForLand() {
+        //Numbers
+        tvOne.setOnClickListener { true.appendOnExpression("1") }
+        tvTwo.setOnClickListener { true.appendOnExpression("2") }
+        tvThree.setOnClickListener { true.appendOnExpression("3") }
+        tvFour.setOnClickListener { true.appendOnExpression("4") }
+        tvFive.setOnClickListener { true.appendOnExpression("5") }
+        tvSix.setOnClickListener { true.appendOnExpression("6") }
+        tvSeven.setOnClickListener { true.appendOnExpression("7") }
+        tvEight.setOnClickListener { true.appendOnExpression("8") }
+        tvNine.setOnClickListener { true.appendOnExpression("9") }
+        tvZero.setOnClickListener { true.appendOnExpression("0") }
+        tvDot.setOnClickListener { true.appendOnExpression(".") }
+
+        //Operators
+        tvPlus.setOnClickListener { true.appendOnExpression("+") }
+        tvMinus.setOnClickListener { true.appendOnExpression("-") }
+        tvMul.setOnClickListener { true.appendOnExpression("*") }
+        tvDivide.setOnClickListener { true.appendOnExpression("/") }
+        tvOpen.setOnClickListener { true.appendOnExpression("(") }
+        tvClose.setOnClickListener { true.appendOnExpression(")") }
+
+        tvSin.setOnClickListener { true.appendOnExpression("sin") }
+        tvCos.setOnClickListener { true.appendOnExpression("cos") }
+        tvTg.setOnClickListener { true.appendOnExpression("tg") }
+        tvCtg.setOnClickListener { true.appendOnExpression("ctg") }
 
 
         tvClear.setOnClickListener {
@@ -82,18 +152,28 @@ class MainActivity : AppCompatActivity() {
         tvResult.text = savedInstanceState.getString("Result")
     }
 
-    private fun appendOnExpression(string: String, canClear: Boolean) {
+    private fun Boolean.appendOnExpression(string: String) {
+         /** Variable Optics  tvExpressive.text = "" */
         if (tvResult.text.isNotEmpty()) {
-            tvExpressive.text = ""
+            tvExpressive.text = tvResult.text
         }
 
-        if (canClear) {
+        if (this) {
             tvResult.text = ""
             tvExpressive.append(string)
         } else {
             tvExpressive.append(tvResult.text)
             tvExpressive.append(string)
             tvResult.text = ""
+        }
+    }
+
+
+    private fun getScreenOrientation(): Boolean? {
+        return when (resources.configuration.orientation) {
+            Configuration.ORIENTATION_PORTRAIT -> true
+            Configuration.ORIENTATION_LANDSCAPE -> false
+            else -> false
         }
     }
 
